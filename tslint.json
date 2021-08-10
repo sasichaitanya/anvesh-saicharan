@@ -1,0 +1,40 @@
+{
+  "rules": {
+    // "semicolon": [true, "never"],
+    // "only-arrow-functions": true,
+    // "no-var-requires": true,
+    // "prefer-for-of": true,
+    // "variable-name": [
+    //   true,
+    //   "ban-keywords",
+    //   "check-format",
+    //   "allow-leading-underscore"
+    // ],
+    // "class-name": true,
+    // "max-file-line-count": [true, 300],
+    // "deprecation": true,
+    // "member-ordering": [true, {"order": "fields-first"}],
+    // "no-console": [true, "error"],
+    // "no-eval": true,
+    // "no-implicit-dependencies": true,
+    // "no-shadowed-variable": true,
+    // "no-string-literal": true,
+    // "strict-comparisons": true,
+    // "switch-default": true,
+    // "binary-expression-operand-order": true,
+    // "encoding": true,
+    // "increment-decrement": [true, "allow-post"],
+    // "eofline": true,
+    // "max-line-length": [
+    //   true,
+    //   {
+    //     "limit": 120,
+    //     "ignore-pattern": "^import |^export {(.*?)}"
+    //   }
+    // ]
+  },
+  "extends": [
+    "tslint-config-standard",
+    "tslint-config-prettier"
+  ]
+}
