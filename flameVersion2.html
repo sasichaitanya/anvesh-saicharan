@@ -10,13 +10,15 @@
   <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
 
   <!-- d3-tip -->
-  <script type="text/javascript" src=https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js> </script> <!--
+  <script type="text/javascript" src=https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js> </script> 
+  <!--
     d3-flamegraph -->
   <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@2.0.3/dist/d3-flamegraph.min.js"></script> -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.min.js"></script>
+  <script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.min.js"></script>
   <script type="text/javascript">
 
-    var stacks = {
+    var stacks1 = {
       "children": [
         {
           "name": "genunix`syscall_mstate",
@@ -2543,6 +2545,40 @@
       "nodeId": uuidv4()
     }
 
+    var stacks = {
+      "children": [
+        {
+          "name": "sss111",
+          "value": 5,
+          "barColor": "#E600E6",
+          "children": [
+            {
+              "name": "s1child",
+              "value": 2,
+              "barColor": "#E600E6"
+            }
+          ]
+        },
+        {
+          "name": "s2",
+          "value": 5,
+          "barColor": "#E600E6",
+          "children": [
+            {
+              "name": "s2child",
+              "value": 3,
+              "barColor": "#E600E6"
+            }
+          ]
+        }
+
+      ],
+      "name": "root",
+      "value": 25,
+      "barColor": "#E600E6",
+      "nodeId": uuidv4()
+    }
+
     function uuidv4() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -2550,7 +2586,7 @@
       });
     }
 
-    function hideBars(arr, id) {
+    function hideBars(arr) {
       arr.forEach(ele => {
         ele.hide = true;
         ele.fade = true;
@@ -2562,9 +2598,21 @@
       });
     }
 
-    var hello = JSON.parse(JSON.stringify(stacks))
+    function openNextLevel(arr, childArr) {
+      arr.forEach(ele => {
+        ele.hide = false;
+        ele.fade = false;
+        ele.barColor = "#E600E6";
+        ele.nodeId = uuidv4();
+        if (ele.children) {
+          hideBars(ele.children)
+        }
+      });
+    }
 
-    hideBars(stacks.children, '');
+    // var hello = JSON.parse(JSON.stringify(stacks))
+
+    hideBars(stacks.children);
 
     var flameGraph = flamegraph()
       .width(960)
@@ -2580,8 +2628,15 @@
         // d.data will get the selected node
         // the below will update the graph 
         debugger
-        flameGraph.update(hello)
-          
+        let nextLevelIds = []
+        if (d.data.children.length > 0) {
+          d.data.children.forEach((ele) => {
+            nextLevelIds.push(ele.nodeId)
+          })
+        }
+        // debugger
+        flameGraph.update(d)
+
       })
       //Example to sort in reverse order
       // .sort(function(a,b){ return d3.descending(a.data.name, b.data.name);})
@@ -2624,3 +2679,6 @@
 <!-- https://github.com/spiermar/d3-flame-graph/issues/98 -->
 
 <!-- https://github.com/spiermar/d3-flame-graph/commit/2b68c0f54d430c7e1c50686b4b76b416ee9ad8c5 -->
+
+<!-- js plugin -->
+<!-- https://adrianmanduc.medium.com/how-to-create-a-js-library-and-publish-it-to-npm-6e6351971984 -->

@@ -1,0 +1,221 @@
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css"
+    href="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@2.0.3/dist/d3-flamegraph.css">
+</head>
+
+<body>
+  <div id="chart"></div>
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+
+  <!-- d3-tip -->
+  <script type="text/javascript" src=https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.min.js> </script>
+  <!--
+    d3-flamegraph -->
+  <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/spiermar/d3-flame-graph@2.0.3/dist/d3-flamegraph.min.js"></script> -->
+  <script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/d3-flame-graph@4.0.6/dist/d3-flamegraph.min.js"></script>
+  <script type="text/javascript">
+  
+    var stacks = {
+      "children": [
+        {
+          "name": "sss111",
+          "value": 12.5,
+          "barColor": "#E600E6",
+          "children": [
+            {
+              "name": "s1child",
+              "value": 12,
+              "barColor": "#E600E6"
+            }
+          ]
+        },
+        {
+          "name": "s2",
+          "value": 12.5,
+          "barColor": "#E600E6",
+          "children": [
+            {
+              "name": "s2child",
+              "value": 11,
+              "barColor": "#E600E6",
+              "children": [
+                {
+                  "name": "s2subchild",
+                  "value": 6,
+                  "barColor": "#E600E6",
+                  "children": [
+                    {
+                      "name": "s2subsubchild",
+                      "value": 5,
+                      "barColor": "#E600E6"
+                    }]
+                }]
+            },
+            {
+              "name": "s21child",
+              "value": 8,
+              "barColor": "#E600E6",
+              "children": []
+            }
+          ]
+        }
+
+      ],
+      "name": "root",
+      "value": 25,
+      "barColor": "#E600E6",
+      "nodeId": uuidv4()
+    }
+
+  
+    var rootNodeData;
+    function uuidv4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function hideBars(arr, id) {
+      arr.forEach(ele => {
+        ele.hide = true;
+        ele.fade = true;
+        ele.barColor = "#E600E6";
+        ele.parentId = id;
+        ele.nodeId = uuidv4();
+        if (ele.children) {
+          hideBars(ele.children,ele.nodeId)
+        }else{
+          ele.children = []
+        }
+      });
+    }
+
+    var hello = JSON.parse(JSON.stringify(stacks));
+    hideBars(stacks.children, stacks.nodeId);
+
+    var flameGraph = flamegraph()
+      .width(960)
+      .cellHeight(18)
+      .transitionDuration(750)
+      .transitionEase(d3.easeCubic)
+      .sort(true)
+      .inverted(true)
+      .setColorMapper(function (d) {
+        return d.data.barColor;
+      })
+      .onClick((d) => {
+        // d.data will get the selected node
+        // the below will update the graph 
+        // debugger
+        if(!rootNodeData || rootNodeData.length<=0){
+          rootNodeData = d.data;
+        }
+
+        let rootObjChildren = checkIsHideNode(rootNodeData['children'], d.data.nodeId);
+        let rootObj = {
+          barColor: '#bcbcbc',
+          name: rootNodeData.name,
+          nodeId: rootNodeData.nodeId,
+          parentId: rootNodeData.parentId,
+          value: rootNodeData.value,
+          fade: false,
+          hide: false,
+          children: rootObjChildren
+        }
+        console.log('--rootObjChildren--', rootObj);
+        
+        document.getElementById('footer').style.display = 'block'
+        document.getElementById('nodeDataName').innerHTML = d.data.name;
+        document.getElementById('nodeDataValue').innerHTML = d.data.value;
+
+        var updatedObj = JSON.parse(JSON.stringify(rootObj));
+        flameGraph.update(updatedObj)
+
+      })
+      //Example to sort in reverse order
+      // .sort(function(a,b){ return d3.descending(a.data.name, b.data.name);})
+      .title("");
+
+    // Example on how to use custom tooltips using d3-tip.
+    var tip = d3.tip()
+      .direction("s")
+      .offset([8, 0])
+      .attr('class', 'd3-flame-graph-tip')
+      .html(function (d) { return "name: " + d.data.name + ", value: " + d.data.value; });
+
+    flameGraph.tooltip(tip);
+
+    // Example on how to use custom labels
+    // var label = function(d) {
+    //  return "name: " + d.data.name + ", value: " + d.data.value;
+    // }
+
+    // flameGraph.label(label);
+
+    // d3.json(stacks, function (error, data) {
+    // if (error) return console.warn(error);
+    var init = d3.select("#chart")
+      .datum(stacks)
+      .call(flameGraph);
+
+
+    //set hide nodes
+    function checkIsHideNode(data, parentId, isParentNode = false) {
+      let childrenNodes = [];
+      for (let i = 0; i < data.length; i++) {
+        childrenNodes[i] = {}
+        for (const [key, value] of Object.entries(data[i])) {
+          childrenNodes[i][key] = value;
+        }
+        childrenNodes[i]['barColor'] = '#3396FF';
+        if (childrenNodes[i]['nodeId'] == parentId ) {
+          isParentNode = true;
+          childrenNodes[i]['hide'] = false;
+          childrenNodes[i]['fade'] = false;
+        } else if ( childrenNodes[i]['parentId'] == parentId) {
+          childrenNodes[i]['hide'] = false;
+          childrenNodes[i]['fade'] = false;
+        } else {
+          childrenNodes[i]['hide'] = true;
+          childrenNodes[i]['fade'] = true;
+        }        
+
+        if (childrenNodes[i]['children'] && childrenNodes[i]['children'].length > 0) {
+          childrenNodes[i]['children'] = checkIsHideNode(childrenNodes[i]['children'], parentId, isParentNode);
+        }
+        
+      }
+      return childrenNodes;
+    }
+
+  </script>
+
+  <div id="footer" > 
+    <p>Name:- <span id='nodeDataName'></span></p>
+    <p>Value:- <span id='nodeDataValue'></span></p> 
+  </div>
+</body>
+
+
+<style>
+  #footer{
+    width: 100%;
+    top:99%;
+    border: 1px solid;
+     display: none;
+  }
+</style>
+
+<!-- required links -->
+
+<!-- How to build data.json from pathes? #89 -->
+<!-- https://github.com/spiermar/d3-flame-graph/issues/89 -->
+
+<!-- Chart randomly builds only 3 levels #98 -->
+<!-- https://github.com/spiermar/d3-flame-graph/issues/98 -->
+
+<!-- https://github.com/spiermar/d3-flame-graph/commit/2b68c0f54d430c7e1c50686b4b76b416ee9ad8c5 -->
