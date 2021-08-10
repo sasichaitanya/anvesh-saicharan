@@ -37,13 +37,6 @@
     "precommit": "lint-staged",
     "travis-deploy-once": "travis-deploy-once"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint",
-      "commit-msg": "commitlint -g ./config/commitlint.config.js -E HUSKY_GIT_PARAMS",
-      "pre-push": "npm run lint"
-    }
-  },
   "lint-staged": {
     "{src,test}/**/*.ts": [
       "prettier --write",
