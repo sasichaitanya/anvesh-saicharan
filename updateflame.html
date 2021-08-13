@@ -5,6 +5,7 @@
 </head>
 
 <body>
+  <div class="scale"><span id="start">0</span><span id="end"></span></div>
   <div id="chart"></div>
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
@@ -89,6 +90,8 @@
 
     var rootNodeData;
     var rootVal = stacks['value'];
+    document.getElementById('end').innerHTML = rootVal;
+
     function uuidv4() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -175,6 +178,7 @@
         document.getElementById('footer').style.display = 'block'
         document.getElementById('nodeDataName').innerHTML = d.data.name;
         document.getElementById('nodeDataValue').innerHTML = d.data.end;
+        document.getElementById('end').innerHTML = d.data.end;
 
         var updatedObj = JSON.parse(JSON.stringify(rootObj));
         flameGraph.update(updatedObj);
@@ -253,6 +257,18 @@
     top: 99%;
     border: 1px solid;
     display: none;
+  }
+  .scale{
+    width: 960px;
+    height: 20px;
+    background-color: rgb(43, 219, 72);
+    margin: 10px 0;
+  }
+  body{
+     padding-left: 50px;
+  }
+  #end{
+    float: right;
   }
 </style>
 
